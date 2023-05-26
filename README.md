@@ -31,10 +31,6 @@ To use Mi Notez locally, follow these steps:
 
 Contributions are welcome! If you have any ideas, suggestions, or bug reports, please create an issue or submit a pull request. Please ensure that your contributions adhere to the project's code style and guidelines.
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
 ## Contact
 
 For any inquiries or support, please contact the Mi Notez team at [lastbenchscholar@gmail.com](mailto:lastbenchscholar@gmail.com).
