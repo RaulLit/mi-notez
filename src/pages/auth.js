@@ -1,38 +1,35 @@
 import { useState } from "react";
 import { auth, provider } from "../config/firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
-export const Auth = () => {
+const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSignIn = async () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((result) => {
         console.log(result);
+        navigate("/");
       })
       .catch((err) => console.log(err));
   };
 
   const signInWithGoogle = async () => {
     signInWithPopup(auth, provider)
-      .then((result) => console.log(result))
-      .catch((err) => console.log(err));
-  };
-
-  const logout = async () => {
-    signOut(auth)
-      .then((result) => console.log(result))
+      .then((result) => {
+        console.log(result);
+        navigate("/");
+      })
       .catch((err) => console.log(err));
   };
 
   return (
     <div className="auth-container">
       <div className="auth">
+        {auth.currentUser && <Navigate replace to="/" />}
         <h2>Sign In</h2>
         <input
           type="email"
@@ -52,12 +49,9 @@ export const Auth = () => {
         <button onClick={signInWithGoogle} className="btn">
           Sign In With Google
         </button>
-        {auth.currentUser && (
-          <button onClick={logout} className="btn">
-            Log out
-          </button>
-        )}
       </div>
     </div>
   );
 };
+
+export default Auth;

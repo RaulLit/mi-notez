@@ -1,26 +1,39 @@
-const { NavLink } = require("react-router-dom");
+import { auth } from "../config/firebase";
+import { signOut } from "firebase/auth";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const logout = async () => {
+    signOut(auth)
+      .then(() => navigate("/"))
+      .catch((err) => console.log(err));
+  };
   return (
     <div className="nav-container">
-      <nav>
-        <div className="logo-container">
-          <NavLink to="/">
-            <img src="./ieeesiesgst_logo.png" alt="" height="50px" />
-          </NavLink>
-        </div>
-        <ul className="nav-list">
+      <div className="logo-container">
+        <NavLink to="/">
+          <img src="./no-bg-logo.png" alt="" height="50px" />
+        </NavLink>
+      </div>
+      <ul className="nav-list">
+        <li className="nav-item">
+          <NavLink to="/">Home</NavLink>
+        </li>
+        {!auth.currentUser && (
           <li className="nav-item">
-            <NavLink to="/">Home</NavLink>
+            <NavLink to="auth">Register</NavLink>
           </li>
+        )}
+        {!auth.currentUser && (
           <li className="nav-item">
-            <NavLink to="quiz">Quiz</NavLink>
+            <button onClick={logout} className="btn">
+              Log out
+            </button>
           </li>
-          <li className="nav-item">
-            <NavLink to="register">Register</NavLink>
-          </li>
-        </ul>
-      </nav>
+        )}
+      </ul>
     </div>
   );
 };
