@@ -1,57 +1,20 @@
-import { useState } from "react";
-import { auth, provider } from "../config/firebase";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { Box, Container, Divider, Paper, Typography } from "@mui/material";
 
-const Auth = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-
-  const handleSignIn = async () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((result) => {
-        console.log(result);
-        navigate("/");
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const signInWithGoogle = async () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log(result);
-        navigate("/");
-      })
-      .catch((err) => console.log(err));
-  };
-
+export const Auth = () => {
   return (
-    <div className="auth-container">
-      <div className="auth">
-        {auth.currentUser && <Navigate replace to="/" />}
-        <h2>Sign In</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-          id="email"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-          id="password"
-        />
-        <button onClick={handleSignIn} className="btn">
-          Sign in
-        </button>
-        <button onClick={signInWithGoogle} className="btn">
-          Sign In With Google
-        </button>
-      </div>
-    </div>
+    <Container
+      sx={{
+        display: "flex",
+        justifyContent: "space-around",
+        alignItems: "center",
+      }}
+    >
+      <Paper>
+        <Typography>Sign up</Typography>
+      </Paper>
+      <Paper>
+        <Typography>Log in</Typography>
+      </Paper>
+    </Container>
   );
 };
-
-export default Auth;

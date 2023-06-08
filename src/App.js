@@ -1,22 +1,34 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { Auth } from "./pages/Auth";
+import { Create } from "./pages/Create";
+import { Layout } from "./components/Layout";
+import { ThemeProvider, createTheme } from "@mui/material";
 
-// COMPONENTS AND PAGES
-import Auth from "./pages/auth";
-import Navbar from "./components/nav";
-import Home from "./pages/home";
+const theme = createTheme({
+  typography: {
+    fontFamily: "Comfortaa",
+    fontWeightLight: 400,
+    fontWeightRegular: 500,
+    fontWeightMedium: 600,
+    fontWeightBold: 700,
+  },
+});
 
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
-        <Navbar />
-        <div className="pages">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/auth" element={<Auth />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/create" element={<Create />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </ThemeProvider>
     </div>
   );
 }
