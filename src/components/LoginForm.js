@@ -7,12 +7,18 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
+import { useNavigate } from "react-router-dom";
+import { isOpenContext } from "../App";
 
 export const LoginForm = () => {
+  const { toggleOpen } = useContext(isOpenContext);
+  const navigate = useNavigate();
   const schema = yup.object().shape({
     email: yup.string().email("Invalid Email").required("Email is required!"),
     password: yup.string().min(4).required("Password is required"),
@@ -26,8 +32,13 @@ export const LoginForm = () => {
     resolver: yupResolver(schema),
   });
 
-  const handleLogin = (data) => {
-    console.log(data);
+  const handleLogin = async (data) => {
+    const email = data.email;
+    const password = data.password;
+    signInWithEmailAndPassword(auth, email, password).then(() => {
+      toggleOpen();
+      navigate("/");
+    });
   };
 
   return (

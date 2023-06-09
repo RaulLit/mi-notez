@@ -3,10 +3,29 @@ import { Button, Container, TextField, Typography } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../config/firebase";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export const SignUpForm = () => {
-  const handleSignUp = (data) => {
-    console.log(data);
+  const [error, setError] = useState();
+  const navigate = useNavigate();
+
+  const handleSignUp = async (data) => {
+    const name = data.username;
+    const email = data.email;
+    const password = data.newPassword;
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        updateProfile(auth.currentUser, {
+          displayName: name,
+        }).then(() => navigate("/"));
+      })
+      .catch((err) => {
+        if (err.message === "Firebase: Error (auth/email-already-in-use).")
+          setError("Email already in use :(");
+      });
   };
 
   //   Validation
@@ -91,6 +110,11 @@ export const SignUpForm = () => {
           Submit
         </Button>
       </form>
+      {error && (
+        <Typography mt={2} color="error">
+          {error}
+        </Typography>
+      )}
     </Container>
   );
 };

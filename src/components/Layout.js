@@ -26,13 +26,17 @@ import {
   styled,
   Divider,
 } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useToggle } from "../hooks/useToggle";
 
 import { auth } from "../config/firebase";
-const authState = auth.currentUser ? true : false;
+import { signOut } from "firebase/auth";
+import { isOpenContext } from "../App";
 
 const drawerWidth = 240;
+
+// CUSTOM STYLED COMPONENTS
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
@@ -83,11 +87,7 @@ export const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [open, setOpen] = useState(authState);
-
-  const toggleOpen = () => {
-    setOpen(!open);
-  };
+  const { open, toggleOpen } = useContext(isOpenContext);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -118,12 +118,19 @@ export const Layout = ({ children }) => {
     {
       text: "Account",
       icon: <Person color="secondary" />,
-      path: "/user/:user/account",
+      path: "/account",
+      handleClick: () => handleNavigate("/account"),
     },
     {
       text: "Logout",
       icon: <Logout color="secondary" />,
       path: "/user/logout",
+      handleClick: () => {
+        signOut(auth).then(() => {
+          toggleOpen();
+          handleNavigate("/auth");
+        });
+      },
     },
   ];
 
@@ -140,7 +147,7 @@ export const Layout = ({ children }) => {
         position="fixed"
       >
         <Toolbar sx={{ marginLeft: 2, marginRight: 2 }}>
-          {authState && (
+          {auth.currentUser && (
             <IconButton
               size="large"
               edge="start"
@@ -153,7 +160,7 @@ export const Layout = ({ children }) => {
             </IconButton>
           )}
           <Typography sx={{ flexGrow: 1 }}>Welcome to notes keeping</Typography>
-          {!authState ? (
+          {!auth.currentUser ? (
             <>
               <Button
                 variant="outlined"
@@ -194,6 +201,7 @@ export const Layout = ({ children }) => {
                       variant="text"
                       endIcon={item.icon}
                       color="secondary"
+                      onClick={item.handleClick}
                     >
                       {item.text}
                     </Button>
@@ -206,7 +214,7 @@ export const Layout = ({ children }) => {
       </AppBar>
 
       {/* SIDE DRAWER */}
-      {authState && (
+      {auth.currentUser && (
         <Drawer
           anchor="left"
           sx={{
