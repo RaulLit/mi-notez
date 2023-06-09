@@ -1,20 +1,20 @@
-import { Box, Container, Divider, Paper, Typography } from "@mui/material";
+import { Container, Divider } from "@mui/material";
+import { SignUpForm } from "../components/SignUpForm";
+import { LoginForm } from "../components/LoginForm";
 
 export const Auth = () => {
   return (
     <Container
+      maxWidth="md"
       sx={{
         display: "flex",
         justifyContent: "space-around",
         alignItems: "center",
       }}
     >
-      <Paper>
-        <Typography>Sign up</Typography>
-      </Paper>
-      <Paper>
-        <Typography>Log in</Typography>
-      </Paper>
+      <SignUpForm />
+      <Divider orientation="vertical" variant="middle" flexItem color="black" />
+      <LoginForm />
     </Container>
   );
 };

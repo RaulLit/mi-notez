@@ -1,0 +1,10 @@
+{
+  "notes": [
+    {
+      "title": "This is a new title",
+      "details": "This is a new description of a new title.",
+      "category": "reminder",
+      "id": 4
+    }
+  ]
+}

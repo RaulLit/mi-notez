@@ -23,18 +23,35 @@ import {
   Toolbar,
   Tooltip,
   Typography,
-  Container,
   styled,
-  useTheme,
   Divider,
 } from "@mui/material";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 // import { auth } from "../config/firebase";
-const auth = true;
+const auth = false;
 
 const drawerWidth = 240;
+
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}`,
+    ...(open && {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: drawerWidth,
+    }),
+  })
+);
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -63,7 +80,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export const Layout = ({ children }) => {
-  const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -72,15 +88,8 @@ export const Layout = ({ children }) => {
   const toggleOpen = () => {
     setOpen(!open);
   };
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const handleListClick = (path) => {
+  const handleNavigate = (path) => {
     navigate(path);
   };
 
@@ -151,6 +160,7 @@ export const Layout = ({ children }) => {
                 endIcon={<Login />}
                 color="secondary"
                 sx={{ m: 1 }}
+                onClick={() => handleNavigate("/auth")}
               >
                 Login
               </Button>
@@ -232,10 +242,10 @@ export const Layout = ({ children }) => {
                     background: "#f4f4f4",
                   },
                 }}
-                className={location.pathname == item.path ? "active" : null}
+                className={location.pathname === item.path ? "active" : null}
                 disablePadding
               >
-                <ListItemButton onClick={() => handleListClick(item.path)}>
+                <ListItemButton onClick={() => handleNavigate(item.path)}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.text} />
                 </ListItemButton>
@@ -245,7 +255,8 @@ export const Layout = ({ children }) => {
         </Drawer>
       )}
 
-      <Box sx={{ flexGrow: 1 }}>{children}</Box>
+      <DrawerHeader />
+      <Main open={open}>{children}</Main>
     </div>
   );
 };
