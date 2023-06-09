@@ -4,19 +4,30 @@ import {
   Button,
   Container,
   Divider,
-  IconButton,
   TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 export const LoginForm = () => {
-  // login states
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const schema = yup.object().shape({
+    email: yup.string().email("Invalid Email").required("Email is required!"),
+    password: yup.string().min(4).required("Password is required"),
+  });
 
-  const handleSubmit = () => {
-    console.log(email, password);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const handleLogin = (data) => {
+    console.log(data);
   };
 
   return (
@@ -27,28 +38,29 @@ export const LoginForm = () => {
       }}
     >
       <Typography variant="h4">Log in</Typography>
-      <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+      <form noValidate autoComplete="off" onSubmit={handleSubmit(handleLogin)}>
         <TextField
-          onChange={(e) => setEmail(e.target.value)}
           margin="normal"
           label="Email"
           variant="outlined"
           color="secondary"
           required
           fullWidth
-          error={false}
-          helperText=""
+          error={errors.email ? true : false}
+          helperText={errors.email?.message}
+          {...register("email")}
         />
         <TextField
-          onChange={(e) => setPassword(e.target.value)}
           margin="normal"
           label="Password"
           variant="outlined"
           color="secondary"
+          type="password"
           required
           fullWidth
-          error={false}
-          helperText=""
+          error={errors.password ? true : false}
+          helperText={errors.password?.message}
+          {...register("password")}
         />
         <Button
           type="submit"

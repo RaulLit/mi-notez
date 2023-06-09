@@ -1,30 +1,32 @@
 import { Send } from "@mui/icons-material";
 import { Button, Container, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 export const SignUpForm = () => {
-  // Signup states
-  const [username, setUsername] = useState("");
-  const [emailSignUp, setEmailSignUp] = useState("");
-  const [passwordSignUp, setPasswordSignUp] = useState("");
-  // Error states
-  const [usernameError, setUsernameError] = useState(false);
-  const [emailSignUpError, setEmailSignUpError] = useState(false);
-  const [passwordSignUpError, setPasswordSignUpError] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setUsernameError(false);
-    setEmailSignUpError(false);
-    setPasswordSignUpError(false);
-
-    if (username == "") setUsernameError(true);
-    if (emailSignUp == "") setEmailSignUpError(true);
-    if (passwordSignUp == "") setPasswordSignUpError(true);
-    if (usernameError && emailSignUpError && passwordSignUpError) {
-      //code
-    }
+  const handleSignUp = (data) => {
+    console.log(data);
   };
+
+  //   Validation
+  const schema = yup.object().shape({
+    username: yup.string().required("Your display name is required!"),
+    email: yup.string().email("Invalid Email!").required("Email is required!"),
+    newPassword: yup.string().min(4).max(20).required(),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref("newPassword"), null], "Password don't match!")
+      .required(),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   return (
     <Container
@@ -34,36 +36,50 @@ export const SignUpForm = () => {
       }}
     >
       <Typography variant="h4">Sign up</Typography>
-      <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+      <form noValidate autoComplete="off" onSubmit={handleSubmit(handleSignUp)}>
         <TextField
-          onChange={(e) => setUsername(e.target.value)}
           margin="normal"
           label="Username"
           variant="outlined"
           color="secondary"
           required
           fullWidth
-          error={usernameError}
+          error={errors.username ? true : false}
+          helperText={errors.username?.message}
+          {...register("username")}
         />
         <TextField
-          onChange={(e) => setEmailSignUp(e.target.value)}
           margin="normal"
           label="Email"
           variant="outlined"
           color="secondary"
           fullWidth
           required
-          error={emailSignUpError}
+          error={errors.email ? true : false}
+          helperText={errors.email?.message}
+          {...register("email")}
         />
         <TextField
-          onChange={(e) => setPasswordSignUp(e.target.value)}
           margin="normal"
-          label="Password"
+          label="New Password"
           variant="outlined"
           color="secondary"
           fullWidth
           required
-          error={passwordSignUpError}
+          error={errors.newPassword ? true : false}
+          helperText={errors.newPassword?.message}
+          {...register("newPassword")}
+        />
+        <TextField
+          margin="normal"
+          label="Confirm Password"
+          variant="outlined"
+          color="secondary"
+          fullWidth
+          required
+          error={errors.confirmPassword ? true : false}
+          helperText={errors.confirmPassword?.message}
+          {...register("confirmPassword")}
         />
         <Button
           type="submit"

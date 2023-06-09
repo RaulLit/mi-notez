@@ -29,8 +29,8 @@ import {
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-// import { auth } from "../config/firebase";
-const auth = false;
+import { auth } from "../config/firebase";
+const authState = auth.currentUser ? true : false;
 
 const drawerWidth = 240;
 
@@ -83,7 +83,7 @@ export const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [open, setOpen] = useState(auth);
+  const [open, setOpen] = useState(authState);
 
   const toggleOpen = () => {
     setOpen(!open);
@@ -140,7 +140,7 @@ export const Layout = ({ children }) => {
         position="fixed"
       >
         <Toolbar sx={{ marginLeft: 2, marginRight: 2 }}>
-          {auth && (
+          {authState && (
             <IconButton
               size="large"
               edge="start"
@@ -153,7 +153,7 @@ export const Layout = ({ children }) => {
             </IconButton>
           )}
           <Typography sx={{ flexGrow: 1 }}>Welcome to notes keeping</Typography>
-          {!auth ? (
+          {!authState ? (
             <>
               <Button
                 variant="outlined"
@@ -206,7 +206,7 @@ export const Layout = ({ children }) => {
       </AppBar>
 
       {/* SIDE DRAWER */}
-      {auth && (
+      {authState && (
         <Drawer
           anchor="left"
           sx={{
