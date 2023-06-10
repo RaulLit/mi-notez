@@ -5,9 +5,14 @@ import { Create } from "./pages/Create";
 import { Account } from "./pages/Account";
 import { Layout } from "./components/Layout";
 import { ThemeProvider, createTheme } from "@mui/material";
-import { createContext } from "react";
 import { useToggle } from "./hooks/useToggle";
 import { auth } from "./config/firebase";
+import { PrivateRoute } from "./PrivateRoute";
+import { AuthContext } from "./contexts/AuthContext";
+import { OpenStateContext } from "./contexts/OpenStateContext";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const theme = createTheme({
   typography: {
@@ -19,25 +24,49 @@ const theme = createTheme({
   },
 });
 
-export const isOpenContext = createContext();
-
 function App() {
-  const [open, toggleOpen] = useToggle(auth.currentUser ? true : false);
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+  }, []);
+  const [open, toggleOpen] = useToggle(user ? true : false);
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
-        <Router>
-          <isOpenContext.Provider value={{ open, toggleOpen }}>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/create" element={<Create />} />
-                <Route path="/account" element={<Account />} />
-              </Routes>
-            </Layout>
-          </isOpenContext.Provider>
-        </Router>
+        <AuthContext.Provider value={{ user }}>
+          <Router>
+            <OpenStateContext.Provider value={{ open, toggleOpen }}>
+              <Layout>
+                <Routes>
+                  <Route
+                    path="/"
+                    exact
+                    element={
+                      <PrivateRoute>
+                        <QueryClientProvider client={client}>
+                          <Home />
+                        </QueryClientProvider>
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/create" element={<Create />} />
+                  <Route path="/account" element={<Account />} />
+                </Routes>
+              </Layout>
+            </OpenStateContext.Provider>
+          </Router>
+        </AuthContext.Provider>
       </ThemeProvider>
     </div>
   );

@@ -1,11 +1,14 @@
 import { auth } from "../config/firebase";
 import { Container, Typography } from "@mui/material";
+import { AuthContext } from "../contexts/AuthContext";
+import { useContext } from "react";
 
 export const Account = () => {
+  const { user } = useContext(AuthContext);
   return (
     <Container>
-      <Typography>Name: {auth.currentUser.displayName}</Typography>
-      <Typography>Email: {auth.currentUser.email}</Typography>
+      <Typography>Name: {user.displayName}</Typography>
+      <Typography>Email: {user.email}</Typography>
     </Container>
   );
 };

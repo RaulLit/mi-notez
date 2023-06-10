@@ -33,8 +33,8 @@ export const Create = () => {
     setTitleError(false);
     setDetailsError(false);
 
-    if (title == "") setTitleError(true);
-    if (details == "") setDetailsError(true);
+    if (title === "") setTitleError(true);
+    if (details === "") setDetailsError(true);
     if (title && details && category) {
       fetch("http://localhost:8000/notes", {
         method: "POST",

@@ -1,33 +1,18 @@
-import { Container, styled } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { NoteCard } from "../components/NoteCard";
 import Masonry from "react-masonry-css";
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
-}));
+import { useFetch } from "../hooks/useFetch";
 
 export const Home = () => {
-  const [notes, setNotes] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:8000/notes")
-      .then((res) => res.json())
-      .then((data) => setNotes(data));
-  }, []);
+  const { data, refetch } = useFetch("http://localhost:8000/notes", "notes");
 
   const handleDelete = async (id) => {
     await fetch("http://localhost:8000/notes/" + id, {
       method: "DELETE",
     });
 
-    const newNotes = notes.filter((item) => item.id != id);
-    setNotes(newNotes);
+    refetch();
   };
 
   const customBreakpoints = {
@@ -43,8 +28,8 @@ export const Home = () => {
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        {notes &&
-          notes.map((item) => (
+        {data &&
+          data.map((item) => (
             <div key={item.id}>
               <NoteCard note={item} handleDelete={handleDelete} />
             </div>

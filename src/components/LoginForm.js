@@ -7,23 +7,26 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
-import { isOpenContext } from "../App";
+import { OpenStateContext } from "../contexts/OpenStateContext";
 
 export const LoginForm = () => {
-  const { toggleOpen } = useContext(isOpenContext);
+  const { toggleOpen } = useContext(OpenStateContext);
   const navigate = useNavigate();
+
+  // Schema
   const schema = yup.object().shape({
     email: yup.string().email("Invalid Email").required("Email is required!"),
     password: yup.string().min(4).required("Password is required"),
   });
 
+  // useForm
   const {
     register,
     handleSubmit,
@@ -32,13 +35,26 @@ export const LoginForm = () => {
     resolver: yupResolver(schema),
   });
 
+  // login with email and password
   const handleLogin = async (data) => {
     const email = data.email;
     const password = data.password;
-    signInWithEmailAndPassword(auth, email, password).then(() => {
-      toggleOpen();
-      navigate("/");
-    });
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        toggleOpen(); // To open side drawer
+        navigate("/");
+      })
+      .catch((err) => console.log(err));
+  };
+
+  // Login with Google
+  const handlePopupLogin = () => {
+    signInWithPopup(auth, provider)
+      .then(() => {
+        toggleOpen(); // To open side drawer
+        navigate("/");
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -87,7 +103,12 @@ export const LoginForm = () => {
       <Box
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
       >
-        <Button color="secondary" variant="text" endIcon={<Google />}>
+        <Button
+          color="secondary"
+          variant="text"
+          endIcon={<Google />}
+          onClick={handlePopupLogin}
+        >
           Sign In With Google
         </Button>
       </Box>
