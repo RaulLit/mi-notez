@@ -100,6 +100,7 @@ export const SignUpForm = () => {
           helperText={errors.newPassword?.message}
           {...register("newPassword")}
         />
+
         <TextField
           margin="normal"
           label="Confirm Password"
