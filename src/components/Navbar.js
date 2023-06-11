@@ -69,12 +69,23 @@ export const Navbar = () => {
       path: "/user/logout",
       handleClick: () => {
         signOut(auth).then(() => {
-          toggleOpen();
           handleNavigate("/auth");
         });
       },
     },
   ];
+
+  const capitaliseFirstLetter = (str) => {
+    if (typeof str === "string") {
+      if (str.length > 0) {
+        return str.charAt(0).toUpperCase();
+      } else {
+        return str;
+      }
+    } else {
+      return str;
+    }
+  };
 
   return (
     <AppBar
@@ -117,7 +128,7 @@ export const Navbar = () => {
             <Tooltip title="Profile">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar src={user?.photoURL} alt={user?.displayName}>
-                  {user?.displayName[0].toUpperCase()}
+                  {capitaliseFirstLetter(user?.displayName)}
                 </Avatar>
               </IconButton>
             </Tooltip>

@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB4l2HgYDFDanO7juzb-yuAvztq9ypPbLw",
@@ -15,7 +16,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
+export const db = getFirestore(app);
 
 onAuthStateChanged(auth, (user) => {
   console.log(user);
 });
+
+// Add a template note
+export const addTemplateNote = async () => {
+  const notesColRef = collection(db, "users", auth.currentUser.uid, "notes");
+  return addDoc(notesColRef, {
+    title: "This is a Title",
+    details: "Here are the details of the title",
+    category: "category",
+  });
+};

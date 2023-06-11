@@ -6,7 +6,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Typography,
+  // Typography,
   Divider,
 } from "@mui/material";
 import { useContext } from "react";
@@ -53,8 +53,14 @@ export const SideDrawer = () => {
         variant="persistent"
         open={open}
       >
-        <div>
-          <Typography
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {/* <Typography
             variant="h5"
             sx={{
               padding: (theme) => theme.spacing(2),
@@ -63,7 +69,12 @@ export const SideDrawer = () => {
             align="center"
           >
             Notes
-          </Typography>
+          </Typography> */}
+          <img
+            src="./no-bg-logo.png"
+            alt="logo"
+            style={{ width: "80%", height: "80%" }}
+          />
         </div>
         <Divider />
         <List>

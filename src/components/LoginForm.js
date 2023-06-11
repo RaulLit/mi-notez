@@ -7,17 +7,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, provider } from "../config/firebase";
+import { addTemplateNote, auth, db, provider } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
-import { OpenStateContext } from "../contexts/OpenStateContext";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export const LoginForm = () => {
-  const { toggleOpen } = useContext(OpenStateContext);
   const navigate = useNavigate();
 
   // Schema
@@ -41,7 +39,6 @@ export const LoginForm = () => {
     const password = data.password;
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        toggleOpen(); // To open side drawer
         navigate("/");
       })
       .catch((err) => console.log(err));
@@ -50,9 +47,24 @@ export const LoginForm = () => {
   // Login with Google
   const handlePopupLogin = () => {
     signInWithPopup(auth, provider)
-      .then(() => {
-        toggleOpen(); // To open side drawer
-        navigate("/");
+      .then(async () => {
+        const docRef = doc(db, "users", auth.currentUser.uid);
+        const snapshot = await getDoc(docRef);
+        if (snapshot.exists()) {
+          navigate("/");
+        } else {
+          setDoc(
+            docRef,
+            { name: auth.currentUser.displayName },
+            { merge: false }
+          )
+            .then(() => {
+              addTemplateNote()
+                .then(() => navigate("/"))
+                .catch((err) => console.log(err));
+            })
+            .catch((err) => console.log(err));
+        }
       })
       .catch((err) => console.log(err));
   };

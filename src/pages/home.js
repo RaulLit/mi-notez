@@ -1,19 +1,34 @@
-import { Container, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Container } from "@mui/material";
 import { NoteCard } from "../components/NoteCard";
 import Masonry from "react-masonry-css";
-import { useFetch } from "../hooks/useFetch";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { auth, db } from "../config/firebase";
+import { useEffect, useState } from "react";
 
 export const Home = () => {
-  const { data, refetch } = useFetch("http://localhost:8000/notes", "notes");
+  const [notes, setNotes] = useState(null);
 
   const handleDelete = async (id) => {
-    await fetch("http://localhost:8000/notes/" + id, {
-      method: "DELETE",
-    });
-
-    refetch();
+    deleteDoc(doc(db, "users", auth.currentUser.uid, "notes", id))
+      .then(() => {
+        const newNotes = notes.filter((item) => item.id != id);
+        setNotes(newNotes);
+      })
+      .catch((err) => console.log(err));
   };
+
+  const colRef = collection(db, "users", auth.currentUser.uid, "notes");
+  const getNotes = async () => {
+    getDocs(colRef)
+      .then((data) =>
+        setNotes(data.docs.map((data) => ({ ...data.data(), id: data.id })))
+      )
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    getNotes();
+  }, []);
 
   const customBreakpoints = {
     default: 3,
@@ -28,8 +43,8 @@ export const Home = () => {
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        {data &&
-          data.map((item) => (
+        {notes &&
+          notes.map((item) => (
             <div key={item.id}>
               <NoteCard note={item} handleDelete={handleDelete} />
             </div>

@@ -1,6 +1,5 @@
 import { styled } from "@mui/material";
 import { useContext } from "react";
-
 import { OpenStateContext } from "../contexts/OpenStateContext";
 import { Navbar } from "./Navbar";
 import { SideDrawer } from "./SideDrawer";

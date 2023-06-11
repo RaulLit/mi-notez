@@ -1,4 +1,3 @@
-import { auth } from "../config/firebase";
 import { Container, Typography } from "@mui/material";
 import { AuthContext } from "../contexts/AuthContext";
 import { useContext } from "react";

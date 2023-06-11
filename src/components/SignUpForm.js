@@ -4,9 +4,10 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { addTemplateNote, auth, db } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
 
 export const SignUpForm = () => {
   const [error, setError] = useState();
@@ -20,7 +21,16 @@ export const SignUpForm = () => {
       .then(() => {
         updateProfile(auth.currentUser, {
           displayName: name,
-        }).then(() => navigate("/"));
+        })
+          .then(() => {
+            const docRef = doc(db, "users", auth.currentUser.uid);
+            setDoc(docRef, { name })
+              .then(() => {
+                addTemplateNote().then(() => navigate("/"));
+              })
+              .catch((err) => console.log(err));
+          })
+          .catch((err) => console.log(err));
       })
       .catch((err) => {
         if (err.message === "Firebase: Error (auth/email-already-in-use).")

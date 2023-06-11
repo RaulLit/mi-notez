@@ -34,12 +34,18 @@ function App() {
   });
 
   const [user, setUser] = useState(null);
+  const [open, toggleOpen, setOpen] = useToggle(user ? true : false);
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setUser(user);
+      if (user) {
+        setOpen(true);
+      } else {
+        setOpen(false);
+      }
     });
   }, []);
-  const [open, toggleOpen] = useToggle(user ? true : false);
+
   return (
     <div className="App">
       <ThemeProvider theme={theme}>

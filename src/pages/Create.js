@@ -10,8 +10,13 @@ import {
   FormControl,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { addDoc, collection } from "firebase/firestore";
+import { auth, db } from "../config/firebase";
+import { useState } from "react";
 
 const sxField = {
   marginTop: "20px",
@@ -20,32 +25,39 @@ const sxField = {
 };
 
 export const Create = () => {
-  const [title, setTitle] = useState("");
-  const [details, setDetails] = useState("");
-  const [titleError, setTitleError] = useState(false);
-  const [detailsError, setDetailsError] = useState(false);
-  const [category, setCategory] = useState("to-do");
-
+  const [category, setCategory] = useState("random");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setTitleError(false);
-    setDetailsError(false);
+  // Schema
+  const schema = yup.object().shape({
+    title: yup.string().max(100).required("Title is required!"),
+    details: yup.string().max(5000).required("Details is required"),
+  });
 
-    if (title === "") setTitleError(true);
-    if (details === "") setDetailsError(true);
-    if (title && details && category) {
-      fetch("http://localhost:8000/notes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, details, category }),
-      }).then(() => navigate("/"));
-    }
+  // useForm
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  // Add to database
+  const notesColRef = collection(db, "users", auth.currentUser.uid, "notes");
+  const handleCreate = (data) => {
+    addDoc(notesColRef, {
+      ...data,
+      category,
+    })
+      .then((res) => {
+        navigate("/");
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
-    <Container sx={{ padding: (theme) => theme.spacing(3) }}>
+    <Container sx={{ padding: (theme) => theme.spacing(1) }}>
       <Typography
         variant="h6"
         component="h2"
@@ -55,19 +67,19 @@ export const Create = () => {
         Create a New Note
       </Typography>
 
-      <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+      <form noValidate autoComplete="off" onSubmit={handleSubmit(handleCreate)}>
         <TextField
-          onChange={(e) => setTitle(e.target.value)}
           sx={sxField}
           label="Note Title"
           variant="outlined"
           color="secondary"
           fullWidth
           required
-          error={titleError}
+          error={errors.title ? true : false}
+          helperText={errors.title?.message}
+          {...register("title")}
         />
         <TextField
-          onChange={(e) => setDetails(e.target.value)}
           sx={sxField}
           label="Details"
           variant="outlined"
@@ -76,7 +88,9 @@ export const Create = () => {
           rows={4}
           fullWidth
           required
-          error={detailsError}
+          error={errors.details ? true : false}
+          helperText={errors.details?.message}
+          {...register("details")}
         />
         <FormControl sx={sxField}>
           <FormLabel>Note Category</FormLabel>
@@ -84,14 +98,21 @@ export const Create = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            <FormControlLabel value="to-do" control={<Radio />} label="To-Do" />
-            <FormControlLabel value="money" control={<Radio />} label="Money" />
+            <FormControlLabel
+              value="random"
+              control={<Radio />}
+              label="Random"
+            />
             <FormControlLabel
               value="reminder"
               control={<Radio />}
               label="Reminder"
             />
-            <FormControlLabel value="work" control={<Radio />} label="Work" />
+            <FormControlLabel
+              value="important"
+              control={<Radio />}
+              label="Important"
+            />
           </RadioGroup>
         </FormControl>
         <Button
