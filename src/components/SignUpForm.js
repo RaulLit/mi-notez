@@ -93,6 +93,7 @@ export const SignUpForm = () => {
           label="New Password"
           variant="outlined"
           color="secondary"
+          type="password"
           fullWidth
           required
           error={errors.newPassword ? true : false}
@@ -104,6 +105,7 @@ export const SignUpForm = () => {
           label="Confirm Password"
           variant="outlined"
           color="secondary"
+          type="password"
           fullWidth
           required
           error={errors.confirmPassword ? true : false}
