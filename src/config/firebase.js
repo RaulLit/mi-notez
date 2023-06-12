@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { addDoc, collection, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -17,10 +17,6 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
 export const db = getFirestore(app);
-
-onAuthStateChanged(auth, (user) => {
-  console.log(user);
-});
 
 // Add a template note
 export const addTemplateNote = async () => {
